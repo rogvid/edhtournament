@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "api"
+version = "0.1.0"
+description = ""
+license = "MIT License"
+authors = ["Rogvi David Arge <rda@flowtale.ai>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+djangorestframework = "^3.11.0"
+django = "^3.0.8"
+django-environ = "^0.4.5"
+django-cors-headers = "^3.4.0"
+psycopg2-binary = "^2.8.5"
+gunicorn = "^20.0.4"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.3"
+pylint-django = "^2.2.0"
+black = "^19.10b0"
+coverage = "^5.2.1"
+
+[build-system]
+requires = ["poetry>=1.0.2"]
+build-backend = "poetry.masonry.api"
