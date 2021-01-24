@@ -21,7 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env(ALLOWED_HOSTS=(list, []))
 env.read_env(env.str("ENV_PATH", os.path.join(BASE_DIR, ".env")))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -41,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap_modal_forms',
+    'widget_tweaks',
     'rest_framework',
     'corsheaders',
     'tournament',
@@ -57,9 +58,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 ROOT_URLCONF = 'api.urls'
-
-
 
 TEMPLATES = [
     {
@@ -80,10 +81,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-    "https://localhost:3000",
-)
-
+CORS_ORIGIN_WHITELIST = ("https://localhost:3000", )
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -91,7 +89,8 @@ CORS_ORIGIN_WHITELIST = (
 DATABASES = {
     'default': {
         "ENGINE": env("SQL_ENGINE", default="django.db.backends.sqlite3"),
-        "NAME": env("SQL_DATABASE", default=os.path.join(BASE_DIR, "db.sqlite3")),
+        "NAME": env("SQL_DATABASE",
+                    default=os.path.join(BASE_DIR, "db.sqlite3")),
         "USER": env("SQL_USER", default="user"),
         "PASSWORD": env("SQL_PASSWORD", default="password"),
         "HOST": env("SQL_HOST", default="localhost"),
@@ -99,28 +98,34 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
+LOGIN_URL = "accounts/login"
+LOGIN_REDIRECT_URL = "index"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
+DATE_FORMAT = "%d %b %Y"
 
 LANGUAGE_CODE = 'en-us'
 
@@ -132,12 +137,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATICFILES_FINDERS = [
+    # searches in STATICFILES_DIRS
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    # searches in STATIC subfolder of each app
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
+
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]

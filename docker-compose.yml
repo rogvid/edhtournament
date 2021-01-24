@@ -15,12 +15,13 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./db/.env.prod
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    env_file:
-      - ./frontend/.env
-    depends_on:
-      - api
-    command: npm start
+    restart: unless-stopped
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - ./frontend/.env
+  #   depends_on:
+  #     - api
+  #   command: npm start

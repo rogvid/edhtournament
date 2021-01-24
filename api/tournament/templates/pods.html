@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Pods Dashboard{% endblock %}
+
+{% block links %}
+<!-- Custom styles for this template-->
+{% endblock %}
+{% block body %}
+<div class="row"
+    <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">
+</div>
+<div class="row">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Tournament</th>
+                <th scope="col">Pod</th>
+                <th scope="col">Status</th>
+                <th scope="col">Winner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tournament in tournaments %}
+            <tr>
+                <td> {{tournament.name}} </td>
+                <td> {{ tournament.created_at }} </td>
+                {% if tournament.finished_at %}
+                <td> Finished </td>
+                {% else %}
+                <td> Ongoing </td>
+                {% endif %}
+                <td style="padding: 0; vertical-align: middle;"> <a href="/tournament/{{ tournament.pk }}/" class="btn btn-default btn-block" > {{tournament.pk}} </a> </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+    {% block scripts %}
+    <script>
+     function myFunction() {
+         var input, filter, ul, li, a, i, txtValue;
+         input = document.getElementById("myInput");
+         filter = input.value.toUpperCase();
+         ul = document.getElementById("myUL");
+         li = ul.getElementsByTagName("li");
+         for (i = 0; i < li.length; i++) {
+             a = li[i].getElementsByTagName("a")[0];
+             txtValue = a.textContent || a.innerText;
+             if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                 li[i].style.display = "";
+             } else {
+                 li[i].style.display = "none";
+             }
+         }
+     }
+    </script>
+    {% endblock %}

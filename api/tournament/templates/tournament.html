@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard for {{ tournament }}{% endblock %}
+
+{% block links %}
+{% endblock %}
+{% block body %}
+
+<script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'js/popper.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+<!-- Modal 1 with create tournament -->
+<div class="modal fade" id="create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- Modal 2 with update tournament -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div class="containter">
+    <div class="row justify-content-center">
+        <h1 class="text-center"> {{ tournament.name }} </h1>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group row justify-content-center" >
+                <label for="searchTournamentName" class="col-2 col-form-label" ><b>Name</b></label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="nameSearch" onkeyup="myFunction('nameSearch', 0, 'participants')" placeholder="Search for participant.." title="Type in a name">
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <button id="create-participant" class="btn btn-primary" type="button" name="button">New Participant</button>
+            </div>
+            <br />
+            <table class="table" id="participants">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Participant</th>
+                        <th scope="col">Points</th>
+                        <th scope="col">OGW%</th>
+                        <th scope="col">GW%</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participant in participants %}
+                    <tr>
+                        <td> {{participant.person.name}} </td>
+                        <td> {{participant.score}} </td>
+                        <td> {{participant.ogw}} </td>
+                        <td> {{participant.gw}} </td>
+                        <td style="text-align: center;">
+                            <button type="button" class="bs-modal btn btn-sm btn-primary" data-form-url="{% url 'update_participant' tournament_id=tournament.pk pk=participant.pk %}"><img style="height: 12px; width: 12px; margin: 3px" src="{% static 'images/pencil_white.png' %}" /> </button>
+                            <button type="button" class="bs-modal btn btn-sm btn-danger" data-form-url="{% url 'delete_participant' tournament_id=tournament.pk pk=participant.pk %}"><img style="height: 12px; width: 12px; margin: 3px" src="{% static 'images/cross_white.png' %}" /> </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-6">
+            <div class="form-group row justify-content-center" >
+                <label for="searchTournamentName" class="col-2 col-form-label" ><b>Round</b></label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="roundSearch" onkeyup="myFunction('roundSearch', 0, 'rounds')" placeholder="Search for round.." title="Type in a name">
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <button id="create-round" onclick="location.href='{% url 'create_round' tournament_id=tournament.pk %}'" class="btn btn-primary" type="button" name="button">New Round</button>
+            </div>
+            <br />
+            <table class="table" id="rounds">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Round</th>
+                        <th scope="col">Pod</th>
+                        <th scope="col">Started</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Winner</th>
+                        <!-- <th scope="col"></th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pod in pods %}
+                    <tr>
+                        <td> {{pod.round_nr}} </td>
+                        <td> {{pod.pk}} </td>
+                        <td> {{pod.created_at}} </td>
+                        {% if pod.finished_at %}
+                        <td> Finished </td>
+                        {% else %}
+                        <td> Ongoing </td>
+                        {% endif %}
+                        {% if not pod.finished_at %}
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-default dropdown-toggle" type="button" id="menu-{{pod.pk}}" data-toggle="dropdown">Select Winner
+                                    <span class="caret"></span></button>
+                                <div class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                                    {% for player in pod.pod_players.all %}
+                                    <a class="dropdown-item" href="{% url 'set_pod_winner' tournament_id=tournament.pk pk=pod.pk player_id=player.pk %}">
+                                        {{player.name}}
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </td>
+                        {% else %}
+                        <td> {{pod.winner.name}} </td>
+                        {% endif %}
+                        <!-- <td style="text-align: center;">
+                             <button type="button" class="bs-modal btn btn-sm btn-primary" data-form-url="{% url 'update_pod' tournament_id=tournament.pk pk=pod.pk %}"><img style="height: 12px; width: 12px; margin: 3px" src="{% static 'images/pencil_white.png' %}" /> </button>
+                             </td> -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $(function() {
+        // Update, Read and Delete book buttons open modal with id="modal" (default)
+        // The formURL is retrieved from the data of the element
+        $(".bs-modal").each(function() {
+            $(this).modalForm({
+                formURL: $(this).data('form-url')
+            });
+        });
+
+        $("#create-participant").modalForm({
+            formURL: "{% url 'create_participant' tournament.pk %}"
+        });
+    });
+</script>
+<script>
+ function myFunction(id, col, table) {
+     var input, filter, ul, rows, txt, i, txtValue;
+     input = document.getElementById(id);
+     filter = input.value.toUpperCase();
+     table = document.getElementById(table);
+     rows = table.getElementsByTagName("tr");
+     for (i = 1; i < rows.length; i++) {
+         txt = rows[i].children[col]
+         txtValue = txt.textContent || txt.innerText;
+         if (txtValue.toUpperCase().indexOf(filter) > -1) {
+             rows[i].style.display = "";
+         } else {
+             rows[i].style.display = "none";
+         }
+     }
+ }
+</script>
+{% endblock %}

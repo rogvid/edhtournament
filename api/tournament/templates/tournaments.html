@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}EDH Tournament Dashboard{% endblock %}
+
+{% block links %}
+{% endblock %}
+{% block body %}
+
+<script src="{% static 'js/jquery-3.2.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/jquery.bootstrap.modal.forms.min.js' %}"></script>
+<!-- Modal 1 with create tournament -->
+<div class="modal fade" id="create-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+<!-- Modal 2 with update tournament -->
+<div class="modal fade" tabindex="-1" role="dialog" id="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<div class="container">
+    <br />
+    <div class="form-group row justify-content-center">
+        <label for="searchTournamentName" class="col-2 col-form-label"><b>Name</b></label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="nameSearch" onkeyup="myFunction('nameSearch', 0)" placeholder="Search for names.." title="Type in a name">
+        </div>
+    </div>
+    <div class="form-group row justify-content-center">
+        <label for="searchTournamentName" class="col-2 col-form-label"><b>Start Date</b></label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="dateSearch" onkeyup="myFunction('dateSearch', 1)" placeholder="Search for start dates.." title="Type in a name">
+        </div>
+    </div>
+    <div class="form-group row justify-content-center">
+        <label for="searchTournamentName" class="col-2 col-form-label"><b>Status</b></label>
+        <div class="col-10">
+            <input type="text" class="form-control" id="statusSearch" onkeyup="myFunction('statusSearch', 2)" placeholder="Search for status.." title="Type in a name">
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <button id="create-tournament" class="btn btn-primary" type="button" name="button"> New Tournament</button>
+    </div>
+    <br />
+    <div class="row">
+        <table class="table table-hover" id="tournaments">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Tournament
+                    </th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tournament in tournaments %}
+                    <tr onclick="window.location='/tournaments/{{ tournament.pk }}/'" style="cursor: pointer;">
+                        <td> {{tournament.name}} </td>
+                        <td> {{ tournament.created_at }} </td>
+                        {% if tournament.finished_at %}
+                        <td> Finished </td>
+                        {% else %}
+                        <td> Ongoing </td>
+                        {% endif %}
+                        <td>
+                            <button type="button" class="bs-modal btn btn-sm btn-primary" data-form-url="{% url 'update_tournament' tournament.pk %}"><img style="height: 12px; width: 12px; margin: 3px" src="{% static 'images/pencil_white.png' %}" /> </button>
+                            <button type="button" class="bs-modal btn btn-sm btn-danger" data-form-url="{% url 'delete_tournament' tournament.pk %}"><img style="height: 12px; width: 12px; margin: 3px" src="{% static 'images/cross_white.png' %}" /> </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function myFunction(id, col) {
+        var input, filter, ul, rows, tournament_name, i, txtValue;
+        input = document.getElementById(id);
+        filter = input.value.toUpperCase();
+        table = document.getElementById("tournaments");
+        rows = table.getElementsByTagName("tr");
+        for (i = 1; i < rows.length; i++) {
+            tournament_name = rows[i].children[col]
+            txtValue = tournament_name.textContent || tournament_name.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+</script>
+<script>
+    $(function() {
+        // Update, Read and Delete book buttons open modal with id="modal" (default)
+        // The formURL is retrieved from the data of the element
+        $(".bs-modal").each(function() {
+            $(this).modalForm({
+                formURL: $(this).data('form-url')
+            });
+        });
+
+        $("#create-tournament").modalForm({
+            formURL: "{% url 'create_tournament' %}"
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+[run]
+source = .
+omit = ./.venv/,./venv/,*tests*
+
+[report]
+omit = ./.venv/*,./venv/*,*tests*

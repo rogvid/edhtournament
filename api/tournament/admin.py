@@ -1,8 +1,10 @@
 from django.contrib import admin
 
-from .models import Player, Pod, Tournament
+from .models import Participant, Person, Player, Pod, Tournament
 
 # Register your models here.
-admin.site.register(Player)
-admin.site.register(Pod)
+admin.site.register(Person)
 admin.site.register(Tournament)
+admin.site.register(Participant)
+admin.site.register(Pod)
+admin.site.register(Player)

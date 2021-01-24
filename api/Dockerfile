@@ -52,11 +52,11 @@ RUN poetry install
 # will become mountpoint of our code
 WORKDIR /app
 
-COPY ./scripts/entrypoint.sh .
+# COPY ./scripts/entrypoint.sh .
 
 COPY . .
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["/app/scripts/entrypoint.sh"]
 
 ################
 #  Production  #
@@ -66,7 +66,9 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 # Create the app user directory
 RUN mkdir -p api
+RUN mkdir -p api/staticfiles
 WORKDIR /api
+
 
 # Create the app user
 RUN addgroup --system user && adduser --system --no-create-home --group user
@@ -83,4 +85,4 @@ USER user
 COPY . .
 
 # run entrypoint.sh
-ENTRYPOINT ["/home/app/web/entrypoint.sh"]
+ENTRYPOINT ["/api/scripts/entrypoint.sh"]
